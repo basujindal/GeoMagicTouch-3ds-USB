@@ -1,3 +1,4 @@
+
 This repository has been forked from the following three repositories:
 1. Francisco Suárez Ruiz, [http://fsuarez6.github.io](http://fsuarez6.github.io) for the Sensable PHANToM haptic device (https://github.com/fsuarez6/phantom_omni)
 
@@ -19,7 +20,7 @@ The goal of this repository is to facilitate the installation of:
 2. OpenHaptics SDK (education version) 
 3. ROS Drivers to communcate with the device on Ubuntu 18.04.
 
-This was successfuly tested on Ubuntu 18.04 LTS 64 bits and ROS Melodic. (It didn't work for us on Ubuntu 20.04). 
+This was successfuly tested on Ubuntu 18.04 LTS 64 bits (Both VirtualBox and Bare Metal Installation) with ROS Melodic. (It didn't work for me on Ubuntu 20.04). 
 
 
 # Install OpenHaptics SDK and GeoMagic/3DS Touch hapic device drivers
@@ -38,7 +39,7 @@ The install is a bit different from the process described in the 3DS instruction
 
 # Install 3D Systems Geomagic Touch ROS Driver
 
-1. Retart the compputer after running the scripts
+1. Retart the PC after running the scripts
 2. Install Dependencies
 
 ```
@@ -48,19 +49,13 @@ sudo apt-get install --no-install-recommends freeglut3-dev g++ libdrm-dev libexp
 3. Device setup
 
 The haptic device always creates a COM Port as /dev/ttyACM0 and requires admin priviliges
-```
-sudo chmod 777 /dev/ttyACM0
-```
+`sudo chmod 777 /dev/ttyACM0`
 
-Run `Touch_Setup` and ensure that the device serial number is displayed. Also click on 'Apply' followed by 'Ok' buttons in the Touch Setup GUI to initialize the device. 
+Now run `Touch_Setup` and ensure that the device serial number is displayed. Also click on 'Apply' followed by 'Ok' buttons in the Touch Setup GUI to initialize the device. 
 
-4. Device Diagnostics
+4. Run `Touch_Diagnostic`. This can be used to calibrate the device, read encoders, apply test forces etc. 
 
-Run `Touch_Diagnostic`. This can be used to calibrate the device, read encoders, apply test forces etc. 
-
-4. Build the ROS Package
-
-Run `catkin_make` inside this repo
+5. Build the ROS Package using `catkin_make` command inside this repo
 
 6. Finally, launch ROS Node
 
