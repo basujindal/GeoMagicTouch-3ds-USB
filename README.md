@@ -38,30 +38,31 @@ The install is a bit different from the process described in the 3DS instruction
 
 # Install 3D Systems Geomagic Touch ROS Driver
 
-1. Install Dependencies
+1. Retart the compputer after running the scripts
+2. Install Dependencies
 
 ```
 sudo apt-get install --no-install-recommends freeglut3-dev g++ libdrm-dev libexpat1-dev libglw1-mesa libglw1-mesa-dev libmotif-dev libncurses5-dev libraw1394-dev libx11-dev libxdamage-dev libxext-dev libxt-dev libxxf86vm-dev tcsh unzip x11proto-dri2-dev x11proto-gl-dev x11proto-print-dev
 ```
 
-2. Device setup
+3. Device setup
 
 The haptic device always creates a COM Port as /dev/ttyACM0 and requires admin priviliges
 ```
 sudo chmod 777 /dev/ttyACM0
 ```
 
-Run `/usr/bin/Touch_Setup` and ensure that the device serial number is displayed 
+Run `Touch_Setup` and ensure that the device serial number is displayed. Also click on 'Apply' followed by 'Ok' buttons in the Touch Setup GUI to initialize the device. 
 
-3. Device Diagnostics
+4. Device Diagnostics
 
-Run `/usr/bin/Touch_Diagnostic`. This can be used to calibrate the device, read encoders, apply test forces etc. 
+Run `Touch_Diagnostic`. This can be used to calibrate the device, read encoders, apply test forces etc. 
 
 4. Build the ROS Package
 
 Run `catkin_make` inside this repo
 
-5. Finally, launch ROS Node
+6. Finally, launch ROS Node
 
 ```
 source devel/setup.bash
