@@ -24,9 +24,9 @@ This was successfuly tested on Ubuntu 18.04 LTS 64 bits and ROS Melodic. (It did
 
 # Install OpenHaptics SDK and GeoMagic/3DS Touch hapic device drivers
 
-These scripts are provided to automate the installation process described in https://support.3dsystems.com/s/article/OpenHaptics-for-Linux-Developer-Edition-v34. The original instructions are at: https://s3.amazonaws.com/dl.3dsystems.com/binaries/Sensable/Linux/Installation+Instructions.pdf.
+The scripts are provided to automate the installation process described in https://support.3dsystems.com/s/article/OpenHaptics-for-Linux-Developer-Edition-v34. The original instructions are at: https://s3.amazonaws.com/dl.3dsystems.com/binaries/Sensable/Linux/Installation+Instructions.pdf.
 
-The 4 scripts provided will perform most of the steps required to download/install OR un-install the files required for the Touch drivers as well as the OpenHaptics SDK. The two install scripts should be executed without `sudo` though sudo privileges are required (you might be prompted for a password). This is so temporary files are not created with root id/gid.
+The 4 scripts provided in the `scripts` folder will perform most of the steps required to download/install OR un-install the files required for the Touch drivers as well as the OpenHaptics SDK. The two install scripts should be executed without `sudo` though sudo privileges are required (you might be prompted for a password). This is so temporary files are not created with root id/gid.
 
 The two uninstall scripts need to be executed with `sudo`.
 
