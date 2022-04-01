@@ -1,7 +1,3 @@
-
-# Introduction
-
-
 This repository has been forked from the following three repositories:
 1. Francisco Suárez Ruiz, [http://fsuarez6.github.io](http://fsuarez6.github.io) for the Sensable PHANToM haptic device (https://github.com/fsuarez6/phantom_omni)
 
@@ -13,6 +9,10 @@ ROS packages developed by the [Group of Robots and Intelligent Machines](http://
 
 
 --- 
+
+
+# Introduction
+
 
 The goal of this repository is to facilitate the installation of:
 1. GeoMagic/3DS Touch hapic device drivers (USB or Ethernet based)
