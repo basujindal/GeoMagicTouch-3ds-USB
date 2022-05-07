@@ -23,24 +23,24 @@ The goal of this repository is to facilitate the installation of:
 This was successfuly tested on Ubuntu 18.04 LTS 64 bits (Both VirtualBox and Bare Metal Installation) with ROS Melodic. (It didn't work for me on Ubuntu 20.04). 
 
 
-# Install OpenHaptics SDK and GeoMagic/3DS Touch hapic device drivers
+# Step-1)  Install OpenHaptics SDK and GeoMagic/3DS Touch hapic device drivers
 
-The scripts are provided to automate the installation process described in https://support.3dsystems.com/s/article/OpenHaptics-for-Linux-Developer-Edition-v34. The original instructions are at: https://s3.amazonaws.com/dl.3dsystems.com/binaries/Sensable/Linux/Installation+Instructions.pdf.
+The 4 scripts provided in the `scripts` folder will perform most of the steps required to download/install OR un-install the files required for the Touch drivers as well as the OpenHaptics SDK.
 
-The 4 scripts provided in the `scripts` folder will perform most of the steps required to download/install OR un-install the files required for the Touch drivers as well as the OpenHaptics SDK. The two install scripts should be executed without `sudo` though sudo privileges are required (you might be prompted for a password). This is so temporary files are not created with root id/gid.
-
-The two uninstall scripts need to be executed with `sudo`.
+- Install the OpenHaptics SDK using `source scripts/install-3ds-openhaptics-3.4.sh`
+- Install the Touch Drivers using `source scripts/install-3ds-touch-drivers-2019.sh`
 
 # Notes
 
+* The scripts are provided to automate the installation process described in https://support.3dsystems.com/s/article/OpenHaptics-for-Linux-Developer-Edition-v34. The original instructions are given [here](https://s3.amazonaws.com/dl.3dsystems.com/binaries/Sensable/Linux/Installation+Instructions.pdf)
 The install is a bit different from the process described in the 3DS instructions:
 * Environment variables are set in `/etc/profile.d` instead of `/etc/environment`
 
 
-# Install 3D Systems Geomagic Touch ROS Driver
+# Step-2) Install 3D Systems Geomagic Touch ROS Driver
 
 1. Retart the PC after running the scripts
-2. Install Dependencies
+2. Install the Dependencies
 
 ```
 sudo apt-get install --no-install-recommends freeglut3-dev g++ libdrm-dev libexpat1-dev libglw1-mesa libglw1-mesa-dev libmotif-dev libncurses5-dev libraw1394-dev libx11-dev libxdamage-dev libxext-dev libxt-dev libxxf86vm-dev tcsh unzip x11proto-dri2-dev x11proto-gl-dev x11proto-print-dev
@@ -48,24 +48,25 @@ sudo apt-get install --no-install-recommends freeglut3-dev g++ libdrm-dev libexp
 
 3. Device setup
 
-The haptic device always creates a COM Port as /dev/ttyACM0 and requires admin priviliges
+- The haptic device always creates a COM Port as /dev/ttyACM0 and requires admin priviliges
 `sudo chmod 777 /dev/ttyACM0`
 
-Now run `Touch_Setup` and ensure that the device serial number is displayed. Also click on 'Apply' followed by 'Ok' buttons in the Touch Setup GUI to initialize the device. 
+- Now run `Touch_Setup` and ensure that the device serial number is displayed. Also click on 'Apply' followed by 'Ok' buttons in the Touch Setup GUI to initialize the device. 
 
 4. Run `Touch_Diagnostic`. This can be used to calibrate the device, read encoders, apply test forces etc. 
 
-5. Build the ROS Package using `catkin_make` command inside this repo
+5. Build the ROS Package by running `catkin_make` command inside this repo
 
-6. Finally, launch ROS Node
+6. Finally, run these commands everytime you need to launch the ROS Node
 
 ```
+sudo chmod 777 /dev/ttyACM0
 source devel/setup.bash
 roslaunch omni_common omni_state.launch 
 ```
 
 
-Data from the haptic device can be read from the following rostopics:
+7) Data from the haptic device can be read from the following rostopics ( `rostopic list`):
 
   /phantom/button
   
@@ -76,5 +77,9 @@ Data from the haptic device can be read from the following rostopics:
   /phantom/pose
   
   /phantom/state 
+  
+ eg: `rostopic echo /phantom/pose`
+  
+ 
 
 
