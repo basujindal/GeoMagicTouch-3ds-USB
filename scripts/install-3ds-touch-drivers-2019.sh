@@ -19,6 +19,7 @@ sudo cp TouchDriver2019_2_14/usr/lib/libPhantomIOLib42.so /usr/lib
 
 echo "--- Create and configure shared directory for configuration files"
 sudo mkdir -p /usr/share/3DSystems/config
+sudo chmod 777 /usr/share/3DSystems/config
 
 echo "--- Create profile.d configurationfile"
 echo "export GTDD_HOME=/usr/share/3DSystems" > 3ds-touch-drivers.sh
