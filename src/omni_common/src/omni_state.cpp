@@ -198,6 +198,19 @@ public:
     pose_msg.header = state_msg.header;
     pose_msg.header.frame_id = ref_frame;
     pose_msg.pose = state_msg.pose;
+
+    // Work around for getting the joint states in pose itself
+    pose_msg.pose.orientation.x = -state->thetas[4] + M_PI;
+    pose_msg.pose.orientation.y = -state->thetas[5] - 3*M_PI/4;
+    pose_msg.pose.orientation.z = -state->thetas[6] - M_PI;
+    int bstate = 0;
+    if(state->buttons[0] == 1 && state->buttons[1] == 1) bstate = 3;
+    else if(state->buttons[0] == 0 && state->buttons[1] == 1) bstate = 2;
+    else if(state->buttons[0] == 1 && state->buttons[1] == 0) bstate = 1;
+    else bstate = 0;
+    pose_msg.pose.orientation.w = bstate;
+    // end of workaround code
+  
     pose_msg.pose.position.x /= 1000.0;
     pose_msg.pose.position.y /= 1000.0;
     pose_msg.pose.position.z /= 1000.0;

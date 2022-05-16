@@ -1,0 +1,143 @@
+import rospy
+from geometry_msgs.msg import PoseStamped
+import time
+import pandas as pd
+from zmqRemoteApi import RemoteAPIClient
+
+
+client = RemoteAPIClient()
+sim = client.getObject('sim')
+
+# Getting object handles 
+targetID = sim.getObjectHandle('TargetPSMR')
+gripper1 =  sim.getObjectHandle("J3_dx_TOOL2")
+gripper2 =  sim.getObjectHandle("J3_sx_TOOL2")
+toolPitch =  sim.getObjectHandle("/RCM_PSM2/J2_TOOL2")
+toolRoll =  sim.getObjectHandle("J1_TOOL2")
+
+
+# Scaling factors for mapping between hardware and simulation
+scale = 1 # mapping geomagic stylus to simulated PSM
+scale_gripper = 0.05 #mapping geomagic stylus button press to simulated PSM gripper
+yaw_sensitivity = 1 # Geomagic yaw to PSM tooltip yaw
+roll_sensitivity = 1.3 # Geomagic Roll to PSM tip roll
+
+
+class callback():
+
+    def __init__(self):
+        self.init_pos = False
+        self.init_orient = False
+        self.posy, self.posx, self.posz = 0,0,0 # Current PSM tooltip position
+
+        # Old tooltip position
+        self.posx_old, self.posy_old, self.posz_old = self.posx, self.posy, self.posz
+        # old values of tool yaw, pitch and roll
+        self.oa, self.ob, self.oc = 0,0,0
+        # Tool Yaw and Roll will only change when sensor_on = True
+        self.sensor_on = False 
+
+        # CSV file to log simultion data
+        self.df = pd.DataFrame(columns = ['Timestamp', 'PSM_L', 'Gripper_L', 'Puzzle_position'])
+        # self.df.to_csv("Experiment1.csv")
+        self.row = {'Timestamp': 0, 'PSM_L': (0,0,0), 'Gripper_L':(0,0), 'Puzzle_position':0}
+
+        # Reading initial position of the Left PSM
+        self.pos =  sim.getObjectPosition(targetID, -1)
+        self.posg1, self.posg2 =  sim.getJointPosition(gripper1),  sim.getJointPosition(gripper2)
+        self.tool_roll, self.tool_pitch =  sim.getJointPosition(toolRoll), sim.getJointPosition(toolPitch)
+
+        # Logging initial position
+        self.row['PSM_L'] = (self.pos, self.tool_roll, self.tool_pitch)
+        self.row['Gripper_L'] = (self.posg1, self.posg2)
+        self.row['Timestamp'] = time.time()
+        self.df = self.df.append(self.row, ignore_index=True)
+        # self.df.to_csv("Experiment1.csv")
+
+    def move_bot(self, data):
+
+        '''
+        Pressing both buttons together on stylus will set 
+        data.pose.orientation.w value to 3 and flip sensor_on bool value.
+        Pressing the upper button only will set the value to 2 and
+        open the PSM gripper and the bottom will set the value to 1 and 
+        close the gripper. 
+        '''
+
+        grip = 0
+        if data.pose.orientation.w == 3:
+            self.sensor_on = not self.sensor_on
+        elif int(data.pose.orientation.w) == 2:
+            grip = -1
+        elif int(data.pose.orientation.w) == 1:
+            grip = 1
+
+        # data.pose.position gives stylus xyz coordinates
+        stylus_pos = data.pose.position
+        self.posx, self.posy, self.posz = stylus_pos.x, stylus_pos.y, stylus_pos.z
+
+        # Moving the PSM tolltip proportional to the change in stylus position
+        if self.init_pos and not self.sensor_on:
+
+            movex = self.posx - self.posx_old
+            movey = self.posy - self.posy_old
+            movez = self.posz - self.posz_old
+            # print(movex, movey,movez)
+            
+            self.pos[0] += movey*scale
+            self.pos[1] -= movex*scale
+            self.pos[2] += movez*scale
+
+            sim.setObjectPosition(targetID,-1,self.pos)
+
+            # Moving the PSM gripper according to the button presses
+
+            if grip:
+                self.posg1 += grip*scale_gripper
+                self.posg2 += grip*scale_gripper
+
+                sim.setJointPosition(gripper1, self.posg1) #gripper1
+                sim.setJointPosition(gripper2, self.posg2) #gripper2
+
+        else:
+            self.init_pos = 1
+        
+        self.posx_old, self.posy_old, self.posz_old = self.posx, self.posy, self.posz
+
+        # Setting tooltip Roll and Yaw
+
+        # data.pose.orientation gives stylus pitch, yaw and roll
+        orient = data.pose.orientation
+        na, nb, nc = orient.x, orient.y, orient.z
+
+        if self.init_orient and self.sensor_on:
+
+            pos_roll = (nc-self.oc)
+            pos_yaw = (nb-self.ob)
+            
+            self.tool_pitch += pos_yaw*yaw_sensitivity
+            self.tool_roll += pos_roll*roll_sensitivity
+            # print(self.tool_pitch, self.tool_roll)
+
+            sim.setJointPosition(toolPitch, self.tool_pitch) 
+            sim.setJointPosition(toolRoll, self.tool_roll)
+
+        else:
+            self.init_orient = 1
+        
+        self.oa,self.ob,self.oc = na,nb,nc
+
+        # Logging data
+        self.row['PSM_L'] = (self.pos, self.tool_roll, self.tool_pitch)
+        self.row['Timestamp'] = time.time()
+        self.row['Gripper_L'] = (self.posg1, self.posg2)
+        self.df = self.df.append(self.row, ignore_index=True)
+        # self.df.to_csv("Experiment1.csv")
+
+
+cb = callback()
+rospy.init_node('position_listen', anonymous=True)
+# Subscribing to phantom/pose which gives xyz position. yaw, pitch, roll
+# and button press event.
+rospy.Subscriber("/phantom/pose", PoseStamped, cb.move_bot)
+rospy.spin()
