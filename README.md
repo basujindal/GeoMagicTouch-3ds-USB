@@ -44,8 +44,8 @@ sudo apt-get install --no-install-recommends freeglut3-dev g++ libdrm-dev libexp
 
 3. Device setup
 
-- The haptic device always creates a COM Port as /dev/ttyACM0 and requires admin priviliges
-  `sudo chmod 777 /dev/ttyACM0`
+- The haptic device creates a COM Port as /dev/ttyACM0 and requires admin priviliges
+  `sudo chmod 777 /dev/ttyACM0`. It may create a COM port with a diffferent name such as /dev/ttyACM0. Run `ls /dev` to check the available ports and change accordingly.
 
 - Now run `Touch_Setup` and ensure that the device serial number is displayed. Also click on 'Apply' followed by 'Ok' buttons in the Touch Setup GUI to initialize the device.
 
@@ -56,7 +56,9 @@ sudo apt-get install --no-install-recommends freeglut3-dev g++ libdrm-dev libexp
 6. Finally, run these commands everytime you need to launch the ROS Node
 
 ```
-sudo chmod 777 /dev/ttyACM0 && source devel/setup.bash && roslaunch omni_common omni_state.launch
+sudo chmod 777 /dev/ttyACM0
+source devel/setup.bash
+roslaunch omni_common omni_state.launch
 ```
 
 7. Data from the haptic device can be read from the following rostopics ( `rostopic list`):
