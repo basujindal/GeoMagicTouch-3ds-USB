@@ -48,8 +48,10 @@ class callback():
         self.df = pd.DataFrame(columns = ['Timestamp', 'PSM_xyz', 'PSM_roll_pitch', 'Gripper_angle_radians', 'Puzzle_position_xyz'])
         self.row = {'Timestamp': 0, 'PSM_xyz': (0,0,0), 'PSM_roll_pitch': (0,0), 'Gripper_angle_radians':(0,0), 'Puzzle_position_xyz':0}
 
-        # Reading initial position of the Left PSM
+        # Setting initial position of the Left PSM
+        sim.setObjectPosition(targetID, -1, [-3.234395742, -0.002902597189, 1.381247759])
         self.pos =  sim.getObjectPosition(targetID, -1)
+
         self.posg1, self.posg2 =  sim.getJointPosition(gripper1),  sim.getJointPosition(gripper2)
         self.tool_roll, self.tool_pitch =  sim.getJointPosition(toolRoll), sim.getJointPosition(toolPitch)
 

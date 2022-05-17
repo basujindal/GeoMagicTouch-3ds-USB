@@ -1,14 +1,14 @@
 #!/usr/bin/env python2
-import rospy
-from std_msgs.msg import String
-from geometry_msgs.msg import PoseStamped
-import math
-import time
-import numpy as np
-from scipy.spatial.transform import Rotation
-import matplotlib.pyplot as plt
+# import rospy
+# from std_msgs.msg import String
+# from geometry_msgs.msg import PoseStamped
+# import math
+# import time
+# import numpy as np
+# from scipy.spatial.transform import Rotation
+# import matplotlib.pyplot as plt
 
-li = []
+# li = []
 # def move_bot(data):
 #     pos = data.pose.position
 
@@ -171,44 +171,44 @@ li = []
 #     listener()
 
 
-from matplotlib.animation import FuncAnimation
+# from matplotlib.animation import FuncAnimation
 
 
-class Visualiser:
-    def __init__(self):
-        self.fig, self.ax = plt.subplots()
-        self.ln, = plt.plot([], [], 'ro')
-        self.x_data, self.y_data = [] , []
+# class Visualiser:
+#     def __init__(self):
+#         self.fig, self.ax = plt.subplots()
+#         self.ln, = plt.plot([], [], 'ro')
+#         self.x_data, self.y_data = [] , []
 
-    def plot_init(self):
-        self.ax.set_xlim(0, 10000)
-        self.ax.set_ylim(-1, 1)
-        return self.ln
+#     def plot_init(self):
+#         self.ax.set_xlim(0, 10000)
+#         self.ax.set_ylim(-1, 1)
+#         return self.ln
     
-    def getYaw(self, pose):
-        orient = pose.orientation
-        rot = Rotation.from_quat([orient.x, orient.y, orient.z, orient.w])
-        euler = rot.as_euler('xyz', degrees=True) #(mobile-yaw, mobile-pitch,mobile-roll )
-        # print(math.radians(euler[0]),math.radians(euler[1]),math.radians(euler[2]))
-        return math.radians(euler[1])
+#     def getYaw(self, pose):
+#         orient = pose.orientation
+#         rot = Rotation.from_quat([orient.x, orient.y, orient.z, orient.w])
+#         euler = rot.as_euler('xyz', degrees=True) #(mobile-yaw, mobile-pitch,mobile-roll )
+#         # print(math.radians(euler[0]),math.radians(euler[1]),math.radians(euler[2]))
+#         return math.radians(euler[1])
 
 
-    def odom_callback(self, msg):
-        yaw_angle = self.getYaw(msg.pose)
-        self.y_data.append(yaw_angle)
-        x_index = len(self.x_data)
-        self.x_data.append(x_index+1)
+#     def odom_callback(self, msg):
+#         yaw_angle = self.getYaw(msg.pose)
+#         self.y_data.append(yaw_angle)
+#         x_index = len(self.x_data)
+#         self.x_data.append(x_index+1)
     
-    def update_plot(self, frame):
-        self.ln.set_data(self.x_data, self.y_data)
-        return self.ln
+#     def update_plot(self, frame):
+#         self.ln.set_data(self.x_data, self.y_data)
+#         return self.ln
 
 
-rospy.init_node('position_listen', anonymous=True)
-# rospy.init_node('pose_listen', anonymous=True)
+# rospy.init_node('position_listen', anonymous=True)
+# # rospy.init_node('pose_listen', anonymous=True)
 
-vis = Visualiser()
-rospy.Subscriber("/phantom/pose", PoseStamped, vis.odom_callback)
+# vis = Visualiser()
+# rospy.Subscriber("/phantom/pose", PoseStamped, vis.odom_callback)
 
-ani = FuncAnimation(vis.fig, vis.update_plot, init_func=vis.plot_init)
-plt.show(block=True) 
+# ani = FuncAnimation(vis.fig, vis.update_plot, init_func=vis.plot_init)
+# plt.show(block=True) 
