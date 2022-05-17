@@ -56,9 +56,7 @@ sudo apt-get install --no-install-recommends freeglut3-dev g++ libdrm-dev libexp
 6. Finally, run these commands everytime you need to launch the ROS Node
 
 ```
-sudo chmod 777 /dev/ttyACM0
-source devel/setup.bash
-roslaunch omni_common omni_state.launch
+sudo chmod 777 /dev/ttyACM0 && source devel/setup.bash && roslaunch omni_common omni_state.launch
 ```
 
 7. Data from the haptic device can be read from the following rostopics ( `rostopic list`):
