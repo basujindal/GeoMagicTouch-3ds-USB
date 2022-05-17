@@ -26,7 +26,7 @@ peg = sim.getObjectHandle("Peg")
 print("Target ID = ", targetID)
 
 # Scaling factors for mapping between hardware and simulation
-scale = 1 # mapping geomagic stylus to simulated PSM
+scale = 1.5 # mapping geomagic stylus to simulated PSM
 yaw_sensitivity = 1 # Geomagic yaw to PSM tooltip yaw
 roll_sensitivity = 1.3 # Geomagic Roll to PSM tip roll
 
@@ -41,8 +41,6 @@ class callback():
         self.posx_old, self.posy_old, self.posz_old = self.posx, self.posy, self.posz
         # old values of tool yaw, pitch and roll
         self.oa, self.ob, self.oc = 0,0,0
-        # Tool Yaw and Roll will only change when sensor_on = True
-        self.sensor_on = False 
 
         # CSV file to log simultion data
         self.df = pd.DataFrame(columns = ['Timestamp', 'PSM_xyz', 'PSM_roll_pitch', 'Gripper_angle_radians', 'Puzzle_position_xyz'])
@@ -76,9 +74,7 @@ class callback():
         log_flag = 0
 
         grip = -1
-        if data.pose.orientation.w == 3:
-            self.sensor_on = not self.sensor_on
-        elif int(data.pose.orientation.w) == 2: #Close the gripper
+        if int(data.pose.orientation.w) == 2: #Close the gripper
             grip = 0
         elif int(data.pose.orientation.w) == 1: #Open the gripper
             grip = 0.7
@@ -88,7 +84,7 @@ class callback():
         self.posx, self.posy, self.posz = stylus_pos.x, stylus_pos.y, stylus_pos.z
 
         # Moving the PSM tolltip proportional to the change in stylus position
-        if self.init_pos and not self.sensor_on:
+        if self.init_pos:
 
             movex = self.posx - self.posx_old
             movey = self.posy - self.posy_old
@@ -121,8 +117,7 @@ class callback():
         orient = data.pose.orientation
         na, nb, nc = orient.x, orient.y, orient.z
 
-        if self.init_orient and self.sensor_on:
-            log_flag = 1
+        if self.init_orient:
 
             pos_roll = (nc-self.oc)
             pos_yaw = (nb-self.ob)
@@ -139,15 +134,14 @@ class callback():
         
         self.oa,self.ob,self.oc = na,nb,nc
 
-        if log_flag:
-            # Logging data
-            self.row['Timestamp'] = time.time()
-            self.row['PSM_xyz'] = (self.pos[0], self.pos[1], self.pos[2])
-            self.row['PSM_roll_pitch'] = (self.tool_roll, self.tool_pitch)
-            self.row['Gripper_angle_radians'] = (self.posg1, self.posg2)
-            self.row['Puzzle_position_xyz'] = sim.getObjectPosition(peg, -1)
-            self.df = self.df.append(self.row, ignore_index=True)
-            self.df.to_csv(log_file)
+        # Logging data
+        self.row['Timestamp'] = time.time()
+        self.row['PSM_xyz'] = (self.pos[0], self.pos[1], self.pos[2])
+        self.row['PSM_roll_pitch'] = (self.tool_roll, self.tool_pitch)
+        self.row['Gripper_angle_radians'] = (self.posg1, self.posg2)
+        self.row['Puzzle_position_xyz'] = sim.getObjectPosition(peg, -1)
+        self.df = self.df.append(self.row, ignore_index=True)
+        self.df.to_csv(log_file)
 
 
 cb = callback()
